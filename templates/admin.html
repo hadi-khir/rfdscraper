@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - RFD Daily Deals{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">
+        <i class="fas fa-cog"></i> Admin Panel
+    </h1>
+    <p class="hero-subtitle">
+        Manage subscribers and send test emails
+    </p>
+    <div class="text-center mt-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('logout') }}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-users text-primary"></i>
+                </h5>
+                <h2 class="text-primary">{{ count }}</h2>
+                <p class="card-text">Total Subscribers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-envelope text-success"></i>
+                </h5>
+                <h2 class="text-success">30</h2>
+                <p class="card-text">Deals per Email</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-clock text-warning"></i>
+                </h5>
+                <h2 class="text-warning">10:00 AM ET</h2>
+                <p class="card-text">Daily Send Time</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Test Email -->
+<div class="subscribe-form">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-paper-plane"></i> Send Test Email
+    </h3>
+    <form method="POST" action="{{ url_for('send_test') }}">
+        <div class="text-center">
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-rocket"></i> Send Test Email to All Subscribers
+            </button>
+        </div>
+        <p class="text-center text-muted mt-2">
+            This will scrape current deals and send them to all {{ count }} subscribers
+        </p>
+    </form>
+</div>
+
+<!-- Subscribers List -->
+<div class="subscribe-form">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-list"></i> Subscribers List
+    </h3>
+    
+    {% if subscribers %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Email Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subscriber in subscribers %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ subscriber }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeSubscriber('{{ subscriber }}')">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p class="text-muted">No subscribers found.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Previously Subscribed List -->
+<div class="subscribe-form">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-list"></i> Inactive Subscribers List
+    </h3>
+    
+    {% if inactive_subscribers %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Email Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subscriber in inactive_subscribers %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ subscriber }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-success" onclick="reactivateSubscriber('{{ subscriber }}')">
+                                <i class="fas fa-check"></i> Reactivate
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p class="text-muted">No subscribers found.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="subscribe-form">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-tools"></i> Quick Actions
+    </h3>
+    <div class="row">
+        <div class="col-md-6">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary w-100 mb-2">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-outline-info w-100 mb-2" onclick="refreshPage()">
+                <i class="fas fa-sync"></i> Refresh Page
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function removeSubscriber(email) {
+    if (confirm('Are you sure you want to remove ' + email + ' from the subscribers list?')) {
+        // Create a form to submit the unsubscribe request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("unsubscribe") }}';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'email';
+        input.value = email;
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function reactivateSubscriber(email) {
+    if (confirm('Are you sure you want to reactivate ' + email + ' as a subscriber?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("reactivate") }}';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'email';
+        input.value = email;
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function refreshPage() {
+    location.reload();
+}
+</script>
+{% endblock %}

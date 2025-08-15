@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}RFD Daily Deals - Get the Best Canadian Deals{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">
+        <i class="fas fa-fire"></i> RFD Daily Deals
+    </h1>
+    <p class="hero-subtitle">
+        Get the hottest deals from RedFlagDeals.com delivered to your inbox every day!
+    </p>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Subscribe Form -->
+<div class="subscribe-form">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-envelope"></i> Subscribe to Daily Deals
+    </h3>
+    <form method="POST" action="{{ url_for('subscribe') }}">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <input type="email" class="form-control" name="email" placeholder="Enter your email address" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-paper-plane"></i> Subscribe
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Unsubscribe Form -->
+<div class="subscribe-form">
+    <h3 class="text-center mb-4">
+        <i class="fas fa-user-times"></i> Unsubscribe
+    </h3>
+    <form method="POST" action="{{ url_for('unsubscribe') }}">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <input type="email" class="form-control" name="email" placeholder="Enter your email address" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-times"></i> Unsubscribe
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Features -->
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <h4>Daily Delivery</h4>
+        <p>Get fresh deals delivered to your inbox every morning at 9 AM.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-thumbs-up"></i>
+        </div>
+        <h4>Community Rated</h4>
+        <p>See which deals are popular with the RedFlagDeals community.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-tags"></i>
+        </div>
+        <h4>Top 30 Deals</h4>
+        <p>We curate the best 30 deals from hundreds of daily posts.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+        </div>
+        <h4>Mobile Friendly</h4>
+        <p>Read your deals on any device with our responsive design.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h4>Privacy Protected</h4>
+        <p>Your email is kept private and you can unsubscribe anytime.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-gift"></i>
+        </div>
+        <h4>Free Service</h4>
+        <p>100% free - no cost to subscribe or receive daily deals.</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>
+        <a href="https://forums.redflagdeals.com/hot-deals-f9/" target="_blank" class="text-decoration-none">
+            Visit RFD Forums
+        </a>
+    </p>
+</div>
+{% endblock %}
