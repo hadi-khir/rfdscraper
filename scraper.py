@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-num_deals = os.getenv('NUM_DEALS')
+num_deals = int(os.getenv('NUM_DEALS', 10))
 
 subject = "Today's Top Deals"
 

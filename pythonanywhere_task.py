@@ -24,7 +24,7 @@ load_dotenv(os.path.join(SCRIPT_DIR, '.env'))
 # Configuration
 EMAIL_SENDER = os.getenv('EMAIL_SENDER')
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-NUM_DEALS = os.getenv('NUM_DEALS')
+NUM_DEALS = int(os.getenv('NUM_DEALS', 10))
 
 def get_subscribers():
     """Get active subscribers from database"""
